@@ -3,68 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2025 台灣綜合所得稅試算表</title>
+  <title>2025 台灣綜合所得稅試算</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    /* 基礎淺色風格 */
+    /* 整體柔和淺色背景 */
     body {
-      background-color: #f8f9fa; /* 非常淺的灰色背景 */
-      color: #343a40; /* 深灰色文字，比純黑柔和 */
-      font-family: 'Arial', sans-serif; /* 設定一個常見的字體 */
+      background-color: #e9ecef; /* 淺灰色背景，比f8f9fa再深一點點，更有層次 */
+      color: #495057; /* 比深灰再淺一點的文字顏色 */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 選擇一個常見且柔和的字體 */
+      padding-top: 20px; /* 頁面上方留白 */
+      padding-bottom: 20px; /* 頁面下方留白 */
     }
 
-    /* 容器樣式 - 增加柔和感 */
+    /* 容器樣式 - 核心內容區塊 */
     .container {
-      max-width: 700px;
-      margin-top: 50px;
+      max-width: 600px; /* 稍微縮小容器寬度，更聚焦 */
+      margin-top: 40px;
+      margin-bottom: 40px;
       background-color: #ffffff; /* 白色背景 */
-      padding: 30px; /* 增加內邊距 */
-      border-radius: 8px; /* 圓角邊框，增加柔和感 */
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* 輕微的陰影，讓容器有浮起來的感覺 */
+      padding: 30px; /* 內邊距 */
+      border-radius: 10px; /* 圓角邊框 */
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* 更明顯但柔和的陰影 */
+    }
+
+    /* 標題 */
+    h2 {
+        color: #343a40; /* 標題使用稍深的顏色 */
+        margin-bottom: 30px; /* 標題下方間距 */
+    }
+
+    /* 表單標籤 */
+    .form-label {
+        color: #495057; /* 標籤文字顏色 */
+        font-weight: 500; /* 輕微加粗 */
+        margin-bottom: 8px; /* 標籤下方間距 */
     }
 
     /* 輸入框和下拉選單樣式 */
-    input, select {
-      background-color: #ffffff; /* 白色背景 */
-      color: #343a40; /* 深灰色文字 */
-      border: 1px solid #ced4da; /* 淺灰色邊框 */
+    input.form-control, select.form-select {
+      background-color: #f8f9fa; /* 淺灰背景 */
+      color: #495057; /* 文字顏色 */
+      border: 1px solid #dee2e6; /* 柔和的邊框 */
+      padding: 10px 15px; /* 內邊距 */
+      border-radius: 5px; /* 圓角 */
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075); /* 輕微內陰影 */
     }
 
     /* 輸入框 placeholder 文字顏色 */
     input::placeholder {
-      color: #6c757d; /* 中灰色 */
-      opacity: 1; /* 確保在 Firefox 中也能完全顯示 */
+      color: #adb5bd; /* 更淺的灰色 */
+      opacity: 1;
     }
 
-    /* Result 區域樣式 */
+    /* 按鈕樣式 */
+    .btn-calculate {
+      background-color: #6c757d; /* 使用 Bootstrap secondary 顏色作為基礎 */
+      border-color: #6c757d;
+      color: #ffffff;
+      padding: 10px 20px;
+      font-size: 1.1rem;
+      border-radius: 5px;
+      transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; /* 添加過渡效果 */
+    }
+
+    .btn-calculate:hover {
+      background-color: #5a6268; /* hover 時變深 */
+      border-color: #545b62;
+    }
+     .btn-calculate:focus {
+        box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25); /* 聚焦時的陰影 */
+     }
+
+    /* 結果顯示區域 */
     .result {
       font-weight: bold;
-      font-size: 1.5rem;
-      color: #007bff; /* 使用一個主題色，例如 Bootstrap 的 primary 藍色 */
+      font-size: 1.4rem; /* 稍微小一點，更柔和 */
+      color: #0056b3; /* 使用一個較柔和的藍色或主色調 */
+      margin-top: 30px; /* 與按鈕間距 */
+      padding-top: 20px; /* 上方內邊距 */
+      border-top: 1px solid #e9ecef; /* 上方加一條細分隔線 */
+      text-align: center;
     }
 
-    /* Bootstrap 的 form-control 和 form-select 在淺色背景下預設樣式就很好，
-       但我們還是明確設定了背景、文字和邊框顏色。 */
-
-    /* Bootstrap 的 btn-primary 已經是柔和的藍色 */
-    .btn-primary {
-        /* 可以不額外設定，使用 Bootstrap 預設樣式 */
+    /* 特定狀態的結果文字 */
+    #taxResult:empty:before {
+        content: "請輸入資料後點擊上方按鈕試算"; /* 在結果為空時顯示提示文字 */
+        color: #adb5bd; /* 提示文字顏色 */
+        font-weight: normal;
+        font-size: 1rem;
     }
 
-    /* 確保文字顏色在 label 和標題等元素上是我們設定的深灰色 */
-    .form-label, h2 {
-        color: #343a40;
-    }
 
   </style>
 </head>
 <body>
   <div class="container">
-    <h2 class="text-center mb-4">2025 台灣綜合所得稅試算表</h2>
+    <h2 class="text-center">2025 台灣綜合所得稅試算</h2>
 
     <div class="mb-3">
-      <label for="income" class="form-label">請輸入您的綜合所得總額（元）</label>
-      <input type="number" id="income" class="form-control" placeholder="例如：800000">
+      <label for="income" class="form-label">綜合所得總額（元）</label>
+      <input type="number" id="income" class="form-control" placeholder="請輸入總額">
     </div>
 
     <div class="mb-3">
@@ -72,77 +110,57 @@
       <select id="status" class="form-select">
         <option value="131000">單身 (標準扣除額 13.1 萬)</option>
         <option value="262000">已婚（合併申報）(標準扣除額 26.2 萬)</option>
-        <!-- 這裡可以使用不同的 value 來代表標準或列舉扣除額，以及身心障礙、長照等特別扣除額，
-             但為了簡化，目前只用身份決定標準扣除額。
-             實際計算需要更詳細的扣除額資料。
-             這裡假設標準扣除額 2025 年調整為單身 13.1萬，已婚 26.2萬 (參考 2024 年數字稍作調整，實際數字需確認)
-             以及免稅額 9.7萬 (參考 2024 年數字稍作調整，實際數字需確認)
-             扶養親屬免稅額也是 9.7萬。
-          -->
+         <!-- 實際 2025 數字需待政府公告 -->
       </select>
     </div>
 
     <div class="mb-3">
-      <label for="dependents" class="form-label">扶養親屬人數</label>
-      <input type="number" id="dependents" class="form-control" value="0" min="0" placeholder="不含本人">
+      <label for="dependents" class="form-label">扶養親屬人數（不含本人）</label>
+      <input type="number" id="dependents" class="form-control" value="0" min="0">
     </div>
 
-    <button onclick="calculateTax()" class="btn btn-primary w-100">計算應納稅額</button>
+    <!-- 注意：此試算為極簡化模型，未考慮其他特別扣除額、基本生活費差額、股利所得、基本稅額等因素 -->
 
-    <div class="mt-4 result text-center" id="taxResult">請輸入資料後點擊上方按鈕試算</div>
+    <button onclick="calculateTax()" class="btn btn-calculate w-100">
+        計算預估應納稅額
+    </button>
+
+    <div class="result" id="taxResult">
+      <!-- 結果會顯示在這裡 -->
+    </div>
   </div>
 
   <script>
-    // **注意**：以下稅率、免稅額、標準扣除額是基於假設或參考近期數字，
-    //         2025 年的確切數字需待政府公告為準。
-    const exemption = 97000; // 一般免稅額 (假設值)
-
-    // 扶養親屬人數的免稅額計算應該是每位親屬一個 exemption
-    // 本人及配偶的免稅額已經在 standardDeduction 中間接或額外考慮
-    // 為了簡化，這裡假設總免稅額 = (本人+配偶+扶養親屬人數) * exemption
-    // 實際計算可能會將本人、配偶、扶養親屬分開計算免稅額
-
+    // **重要提示**：以下稅率、免稅額、標準扣除額、級距等數據僅供參考，
+    //             實際 2025 年數字需以財政部公告為準。
+    //             此試算亦不包含所有可能的扣除額及稅法細節。
+    const exemption = 97000; // 假設一般免稅額 9.7 萬
     const taxBrackets = [
-      // 2025 年的稅率級距需待政府公告，以下為假設或參考近期數字
+      // 假設 2025 年稅率級距與 2024 年相同
       { max: 590000, rate: 0.05, diff: 0 },
-      { max: 1330000, rate: 0.12, diff: 41300 }, // 累進差額 = 590000 * 0.12 - 590000 * 0.05 = 41300
-      { max: 2660000, rate: 0.20, diff: 147700 }, // 累進差額 = 41300 + (1330000 - 590000) * 0.20 - (1330000 - 590000) * 0.12 = 41300 + 740000 * 0.08 = 41300 + 59200 = 100500 (計算有誤，需使用正確公式或查表)
-      // 正確累進差額計算方式：前一級稅額上限 * (本級稅率 - 前一級稅率) + 前一級累進差額
-      // 5%: 0
-      // 12%: 590000 * (0.12 - 0.05) + 0 = 590000 * 0.07 = 41300
-      // 20%: 1330000 * (0.20 - 0.12) + 41300 = 1330000 * 0.08 + 41300 = 106400 + 41300 = 147700
-      // 30%: 2660000 * (0.30 - 0.20) + 147700 = 2660000 * 0.10 + 147700 = 266000 + 147700 = 413700
-      // 40%: 4980000 * (0.40 - 0.30) + 413700 = 4980000 * 0.10 + 413700 = 498000 + 413700 = 911700
+      { max: 1330000, rate: 0.12, diff: 41300 }, // 累進差額計算同前一個版本
+      { max: 2660000, rate: 0.20, diff: 147700 },
       { max: 4980000, rate: 0.30, diff: 413700 },
       { max: Infinity, rate: 0.40, diff: 911700 }
     ];
 
-
     function calculateTax() {
       const income = parseInt(document.getElementById('income').value) || 0;
-      // standardDeduction 代表申報身份帶來的標準扣除額
-      const standardDeduction = parseInt(document.getElementById('status').value);
+      const standardDeduction = parseInt(document.getElementById('status').value); // 標準扣除額由身份決定
       const dependents = parseInt(document.getElementById('dependents').value) || 0;
 
-      // 計算總免稅額
-      // 單身或已婚都至少包含本人。已婚合併申報包含本人及配偶。
-      // 因此，免稅額人數基礎為 1 (本人) + (申報身份為已婚則加 1, 否則加 0) + 扶養親屬人數
-      // 為了簡化，這裡沿用原邏輯：總免稅額 = 免稅額 * (扶養親屬人數 + 1)
-      // 這表示假設單身包含本人免稅額，已婚不額外算配偶免稅額，而是反映在標準扣除額較高？
-      // 這種算法與台灣稅法實際算法(每人都有免稅額，再加標準或列舉扣除額)略有差異。
-      // 實際算法應為：免稅額 = (本人免稅額) + (配偶免稅額，如已婚) + (扶養親屬人數 * 親屬免稅額)
-      // let totalExemption = exemption * (1 + (standardDeduction === 262000 ? 1 : 0) + dependents);
-      // 然而，為了忠於原程式結構，我們保留原邏輯，但請注意這是一個簡化模型。
-      const totalExemption = exemption * (dependents + 1); // 這裡沿用原程式邏輯，假設扶養親屬人數+本人 (或本人+配偶+扶養親屬人數)
+      // 計算總免稅額：本人 + 扶養親屬
+      // 已婚合併申報時，標準扣除額已是單身的兩倍，這裡簡化為只計算本人及扶養親屬的免稅額
+      // 更精確應為 (本人免稅額 + 配偶免稅額(如已婚) + 扶養親屬 * 親屬免稅額)
+      // 這裡採用 (1 + dependents) * exemption 的簡易模型，與提供的標準扣除額配合
+      const totalExemption = exemption * (1 + dependents);
 
-      // 計算所得淨額 (總所得 - 標準扣除額 - 總免稅額 - 特別扣除額...)
-      // 這裡只計算 最基本的 所得淨額 = 總所得 - 標準扣除額 - 總免稅額
-      // 實際計算需要考慮各種特別扣除額 (薪資所得、儲蓄投資、身心障礙、教育學費、幼兒學前、長期照顧、購屋借款利息、租金支出...等)
+      // 計算所得淨額 (所得總額 - 標準扣除額 - 總免稅額)
+      // 此處未考慮特別扣除額 (薪資、儲蓄、教育、幼兒、長照、身心障礙等)
       const netIncome = income - standardDeduction - totalExemption;
 
-      // 應稅所得額 = 所得淨額，但不小於 0
+      // 計算應稅所得額 (所得淨額，但不為負數)
       const taxable = Math.max(netIncome, 0);
-
 
       let rate = 0, diff = 0;
       for (const bracket of taxBrackets) {
@@ -156,20 +174,20 @@
       // 計算綜合所得稅額 = 應稅所得額 * 稅率 - 累進差額
       const tax = taxable * rate - diff;
 
-      // 應納稅額 = 綜合所得稅額，但不小於 0。實際還需扣除基本稅額與海外所得差額、投資抵減等。
-      // 這裡顯示的是綜合所得稅額計算的初步結果。
+      // 最終應納稅額，取計算結果與 0 的最大值，並四捨五入。
+      // 實際稅法還有基本生活費差額、基本稅額、海外所得、投資抵減等複雜計算。
       const payableTax = Math.max(Math.round(tax), 0);
 
+      const resultText = `
+        您的所得淨額約：<span style="color:#007bff;">${Math.max(Math.round(netIncome), 0).toLocaleString()}</span> 元<br>
+        您的應稅所得約：<span style="color:#007bff;">${Math.round(taxable).toLocaleString()}</span> 元<br>
+        適用稅率：<span style="color:#007bff;">${(rate * 100).toFixed(0)}</span> %<br>
+        <hr style="margin: 15px 0; border-color: #e9ecef;">
+        <strong>預估應納稅額：<span style="color:#dc3545;">${payableTax.toLocaleString()}</span> 元</strong>
+      `;
 
-      document.getElementById('taxResult').textContent =
-        `💰 您的所得淨額約：${Math.max(Math.round(netIncome), 0).toLocaleString()} 元
-         🎯 您的應稅所得約：${Math.round(taxable).toLocaleString()} 元
-         📊 適用稅率：${(rate * 100).toFixed(0)} %
-         計算結果：應納稅額約 ${payableTax.toLocaleString()} 元`;
+      document.getElementById('taxResult').innerHTML = resultText;
     }
-
-    // 首次載入時也執行一次計算 (如果輸入框有預設值的話)
-    // calculateTax(); // 除非輸入框有預設值，否則可以不安裝執行
   </script>
 </body>
 </html>
