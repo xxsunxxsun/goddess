@@ -10,7 +10,7 @@
     body {
       background-color: #e9ecef; /* 淺灰色背景*/
       color: #495057; /* 比深灰再淺一點的文字顏色 */
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding-top: 20px; /* 頁面上方留白 */
       padding-bottom: 20px; /* 頁面下方留白 */
     }
@@ -64,6 +64,7 @@
       font-size: 1.1rem;
       border-radius: 5px;
       transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; /* 添加過渡效果 */
+      margin-bottom: 30px; /* 在按鈕下方增加間距 */
     }
 
     .btn-calculate:hover {
@@ -93,6 +94,31 @@
         font-size: 1rem;
     }
 
+    /* 表格標題 */
+    .table-caption {
+        text-align: center;
+        margin-bottom: 15px;
+        font-weight: bold;
+        color: #495057;
+    }
+
+    /* 表格樣式調整 */
+    .tax-bracket-table {
+        margin-top: 20px; /* 表格上方間距 */
+        font-size: 0.9rem; /* 表格文字稍微小一點 */
+    }
+
+    .tax-bracket-table th, .tax-bracket-table td {
+        padding: 8px; /* 縮小表格內邊距 */
+    }
+
+    /* 表格註解 */
+    .table-note {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 10px;
+        text-align: center;
+    }
 
   </style>
 </head>
@@ -115,7 +141,7 @@
     </div>
 
     <div class="mb-3">
-      <label for="dependents" class="form-label">扶養親屬人數（不含本人）</label>
+      <label for="dependents" class="form-label">扶養親屬人數（不含本人及配偶）</label>
       <input type="number" id="dependents" class="form-control" value="0" min="0">
     </div>
 
@@ -124,6 +150,52 @@
     <button onclick="calculateTax()" class="btn btn-calculate w-100">
         計算預估應納稅額
     </button>
+
+    <!-- 加入稅率級距表格 -->
+    <div class="tax-bracket-table">
+        <div class="table-caption">2025 綜合所得稅稅率級距參考</div>
+        <table class="table table-striped table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">綜合所得淨額級距 (元)</th>
+                    <th scope="col">稅率 (%)</th>
+                    <th scope="col">累進差額 (元)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0 至 590,000</td>
+                    <td>5</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>590,001 至 1,330,000</td>
+                    <td>12</td>
+                    <td>41,300</td>
+                </tr>
+                <tr>
+                    <td>1,330,001 至 2,660,000</td>
+                    <td>20</td>
+                    <td>147,700</td>
+                </tr>
+                <tr>
+                    <td>2,660,001 至 4,980,000</td>
+                    <td>30</td>
+                    <td>413,700</td>
+                </tr>
+                <tr>
+                    <td>超過 4,980,000</td>
+                    <td>40</td>
+                    <td>911,700</td>
+                </tr>
+            </tbody>
+        </table>
+         <div class="table-note">
+             * 上述級距、稅率及累進差額係參考 2024 年度公告數字，2025 年度實際數字可能調整，請以財政部公告為準。<br>
+             * 所得淨額 = 綜合所得總額 - 免稅額 - 標準扣除額/列舉扣除額 - 特別扣除額。此試算僅含免稅額與標準扣除額。
+        </div>
+    </div>
+    <!-- 表格結束 -->
 
     <div class="result" id="taxResult">
       <!-- 結果會顯示在這裡 -->
@@ -138,7 +210,7 @@
     const taxBrackets = [
       // 假設 2025 年稅率級距與 2024 年相同
       { max: 590000, rate: 0.05, diff: 0 },
-      { max: 1330000, rate: 0.12, diff: 41300 }, // 累進差額計算同前一個版本
+      { max: 1330000, rate: 0.12, diff: 41300 },
       { max: 2660000, rate: 0.20, diff: 147700 },
       { max: 4980000, rate: 0.30, diff: 413700 },
       { max: Infinity, rate: 0.40, diff: 911700 }
@@ -149,18 +221,27 @@
       const standardDeduction = parseInt(document.getElementById('status').value); // 標準扣除額由身份決定
       const dependents = parseInt(document.getElementById('dependents').value) || 0;
 
-      // 計算總免稅額：本人 + 扶養親屬
-      // 已婚合併申報時，標準扣除額已是單身的兩倍，這裡簡化為只計算本人及扶養親屬的免稅額
-      // 更精確應為 (本人免稅額 + 配偶免稅額(如已婚) + 扶養親屬 * 親屬免稅額)
-      // 這裡採用 (1 + dependents) * exemption 的簡易模型，與提供的標準扣除額配合
-      const totalExemption = exemption * (1 + dependents);
+      // 計算總免稅額：本人 + (配偶如果已婚) + 扶養親屬
+      // 這裡的簡易模型是 (本人 + 扶養親屬) * 免稅額
+      // 更精確應根據申報身份判斷是否加計配偶免稅額，這裡配合標準扣除額的簡化，繼續使用 (1 + dependents) 模型
+      // 如果選擇已婚，總免稅額計算應為 (本人 + 配偶 + 扶養親屬) * 免稅額 = (2 + dependents) * exemption
+      // 為了符合一般理解的計算，修正總免稅額計算方式
+      let totalExemption;
+      const status = document.getElementById('status').value;
+      if (status === '131000') { // 單身
+          totalExemption = exemption * (1 + dependents);
+      } else { // 已婚
+          totalExemption = exemption * (2 + dependents);
+      }
+
 
       // 計算所得淨額 (所得總額 - 標準扣除額 - 總免稅額)
       // 此處未考慮特別扣除額 (薪資、儲蓄、教育、幼兒、長照、身心障礙等)
       const netIncome = income - standardDeduction - totalExemption;
 
       // 計算應稅所得額 (所得淨額，但不為負數)
-      const taxable = Math.max(netIncome, 0);
+      // 應稅所得額 = 所得淨額 - 特別扣除額 (此處未計算特別扣除額，所以應稅所得額 = 所得淨額，最低為0)
+      const taxable = Math.max(netIncome, 0); // 在此簡易試算中，應稅所得額等於所得淨額(不為負)
 
       let rate = 0, diff = 0;
       for (const bracket of taxBrackets) {
@@ -178,12 +259,23 @@
       // 實際稅法還有基本生活費差額、基本稅額、海外所得、投資抵減等複雜計算。
       const payableTax = Math.max(Math.round(tax), 0);
 
+       // 格式化數字，每三位加逗號
+      function formatNumber(num) {
+          return num.toLocaleString();
+      }
+
+
       const resultText = `
-        您的所得淨額約：<span style="color:#007bff;">${Math.max(Math.round(netIncome), 0).toLocaleString()}</span> 元<br>
-        您的應稅所得約：<span style="color:#007bff;">${Math.round(taxable).toLocaleString()}</span> 元<br>
+        所得總額：<span style="color:#007bff;">${formatNumber(income)}</span> 元<br>
+        總免稅額：<span style="color:#007bff;">${formatNumber(totalExemption)}</span> 元<br>
+        標準扣除額：<span style="color:#007bff;">${formatNumber(standardDeduction)}</span> 元<br>
+        所得淨額約：<span style="color:#007bff;">${formatNumber(Math.max(Math.round(netIncome), 0))}</span> 元<br>
+        <!-- 在此簡易試算中，應稅所得額等於所得淨額 -->
+        應稅所得約：<span style="color:#007bff;">${formatNumber(Math.round(taxable))}</span> 元<br>
         適用稅率：<span style="color:#007bff;">${(rate * 100).toFixed(0)}</span> %<br>
+        累進差額：<span style="color:#007bff;">${formatNumber(diff)}</span> 元<br>
         <hr style="margin: 15px 0; border-color: #e9ecef;">
-        <strong>預估應納稅額：<span style="color:#dc3545;">${payableTax.toLocaleString()}</span> 元</strong>
+        <strong>預估應納稅額：<span style="color:#dc3545;">${formatNumber(payableTax)}</span> 元</strong>
       `;
 
       document.getElementById('taxResult').innerHTML = resultText;
