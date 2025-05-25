@@ -1,285 +1,166 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2025 台灣綜合所得稅試算</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>女神 400 速解小工具</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* 整體柔和淺色背景 */
-    body {
-      background-color: #e9ecef; /* 淺灰色背景*/
-      color: #495057; /* 比深灰再淺一點的文字顏色 */
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding-top: 20px; /* 頁面上方留白 */
-      padding-bottom: 20px; /* 頁面下方留白 */
+    /* 確保所有元素在過渡時都包含陰影、背景、邊框的變化 */
+    .transition-all {
+      transition-property: all;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 200ms;
     }
-
-    /* 容器樣式 - 核心內容區塊 */
-    .container {
-      max-width: 600px; /* 稍微縮小容器寬度，更聚焦 */
-      margin-top: 40px;
-      margin-bottom: 40px;
-      background-color: #ffffff; /* 白色背景 */
-      padding: 30px; /* 內邊距 */
-      border-radius: 10px; /* 圓角邊框 */
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* 更明顯但柔和的陰影 */
-    }
-
-    /* 標題 */
-    h2 {
-        color: #343a40; /* 標題使用稍深的顏色 */
-        margin-bottom: 30px; /* 標題下方間距 */
-    }
-
-    /* 表單標籤 */
-    .form-label {
-        color: #495057; /* 標籤文字顏色 */
-        font-weight: 500; /* 輕微加粗 */
-        margin-bottom: 8px; /* 標籤下方間距 */
-    }
-
-    /* 輸入框和下拉選單樣式 */
-    input.form-control, select.form-select {
-      background-color: #f8f9fa; /* 淺灰背景 */
-      color: #495057; /* 文字顏色 */
-      border: 1px solid #dee2e6; /* 柔和的邊框 */
-      padding: 10px 15px; /* 內邊距 */
-      border-radius: 5px; /* 圓角 */
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075); /* 輕微內陰影 */
-    }
-
-    /* 輸入框 placeholder 文字顏色 */
-    input::placeholder {
-      color: #adb5bd; /* 更淺的灰色 */
-      opacity: 1;
-    }
-
-    /* 按鈕樣式 */
-    .btn-calculate {
-      background-color: #6c757d; /* 使用 Bootstrap secondary 顏色作為基礎 */
-      border-color: #6c757d;
-      color: #ffffff;
-      padding: 10px 20px;
-      font-size: 1.1rem;
-      border-radius: 5px;
-      transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; /* 添加過渡效果 */
-      margin-bottom: 30px; /* 在按鈕下方增加間距 */
-    }
-
-    .btn-calculate:hover {
-      background-color: #5a6268; /* hover 時變深 */
-      border-color: #545b62;
-    }
-     .btn-calculate:focus {
-        box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25); /* 聚焦時的陰影 */
-     }
-
-    /* 結果顯示區域 */
-    .result {
-      font-weight: bold;
-      font-size: 1.4rem; /* 稍微小一點，更柔和 */
-      color: #0056b3; /* 使用一個較柔和的藍色或主色調 */
-      margin-top: 30px; /* 與按鈕間距 */
-      padding-top: 20px; /* 上方內邊距 */
-      border-top: 1px solid #e9ecef; /* 上方加一條細分隔線 */
-      text-align: center;
-    }
-
-    /* 特定狀態的結果文字 */
-    #taxResult:empty:before {
-        content: "請輸入資料後點擊上方按鈕試算"; /* 在結果為空時顯示提示文字 */
-        color: #adb5bd; /* 提示文字顏色 */
-        font-weight: normal;
-        font-size: 1rem;
-    }
-
-    /* 表格標題 */
-    .table-caption {
-        text-align: center;
-        margin-bottom: 15px;
-        font-weight: bold;
-        color: #495057;
-    }
-
-    /* 表格樣式調整 */
-    .tax-bracket-table {
-        margin-top: 20px; /* 表格上方間距 */
-        font-size: 0.9rem; /* 表格文字稍微小一點 */
-    }
-
-    .tax-bracket-table th, .tax-bracket-table td {
-        padding: 8px; /* 縮小表格內邊距 */
-    }
-
-    /* 表格註解 */
-    .table-note {
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-top: 10px;
-        text-align: center;
-    }
-
   </style>
 </head>
-<body>
-  <div class="container">
-    <h2 class="text-center">2025 台灣綜合所得稅試算</h2>
-
-    <div class="mb-3">
-      <label for="income" class="form-label">綜合所得總額（元）</label>
-      <input type="number" id="income" class="form-control" placeholder="請輸入總額">
+<body id="body" class="flex justify-center bg-sky-50 min-h-screen p-4 md:p-8">
+  <div class="max-w-3xl w-full my-6 bg-white rounded-3xl shadow-2xl p-6 md:p-10">
+    <div class="text-3xl md:text-6xl font-extrabold text-center text-blue-700 tracking-wider drop-shadow-md mb-8 md:mb-12">
+      女神 400房 速解 小工具
     </div>
 
-    <div class="mb-3">
-      <label for="status" class="form-label">申報身份</label>
-      <select id="status" class="form-select">
-        <option value="131000">單身 (標準扣除額 13.1 萬)</option>
-        <option value="262000">已婚（合併申報）(標準扣除額 26.2 萬)</option>
-         <!-- 實際 2025 數字需待政府公告 -->
-      </select>
-    </div>
+    <div class="w-full p-4 md:p-6 border border-blue-200 rounded-2xl mb-6 bg-blue-50">
+      <div id="output" class="h-36 md:h-48 text-5xl md:text-7xl font-extrabold flex justify-center items-center rounded-xl bg-white shadow-inner border border-blue-300 text-blue-800 mb-8 md:mb-12 py-4">
+        <!-- 輸出結果將顯示在這裡 -->
+      </div>
 
-    <div class="mb-3">
-      <label for="dependents" class="form-label">扶養親屬人數（不含本人及配偶）</label>
-      <input type="number" id="dependents" class="form-control" value="0" min="0">
-    </div>
+      <div class="w-full">
+        <div class="flex flex-col mb-8">
+          <!-- 平台狀態說明 -->
+          <div class="flex flex-col md:flex-row items-start md:items-center mb-10">
+            <p class="md:w-1/3 w-full text-center md:text-left text-xl md:text-2xl font-bold text-blue-700 mb-4 md:mb-0">平台狀態</p>
+            <div class="text-gray-600 flex-1 pl-0 md:pl-4">
+              <div class="flex items-center mb-2"><p class="px-2 w-10 font-bold text-base">0:</p><p class="text-sm md:text-base">沒有任何平台是正確的</p></div>
+              <div class="flex items-center mb-2"><p class="px-2 w-10 font-bold text-base">1:</p><p class="text-sm md:text-base">只有 1 個平台是正確的</p></div>
+              <div class="flex items-center"><p class="px-2 w-10 font-bold text-base">2:</p><p class="text-sm md:text-base">只有 2 個平台是正確的</p></div>
+            </div>
+          </div>
 
-    <!-- 注意：此試算為極簡化模型，未考慮其他特別扣除額、基本生活費差額、股利所得、基本稅額等因素 -->
+          <!-- 選擇區 -->
+          <div id="groups" class="space-y-8 md:space-y-10"></div>
 
-    <button onclick="calculateTax()" class="btn btn-calculate w-100">
-        計算預估應納稅額
-    </button>
-
-    <!-- 加入稅率級距表格 -->
-    <div class="tax-bracket-table">
-        <div class="table-caption">2025 綜合所得稅稅率級距參考</div>
-        <table class="table table-striped table-bordered table-sm">
-            <thead>
-                <tr>
-                    <th scope="col">綜合所得淨額級距 (元)</th>
-                    <th scope="col">稅率 (%)</th>
-                    <th scope="col">累進差額 (元)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>0 至 590,000</td>
-                    <td>5</td>
-                    <td>0</td>
-                </tr>
-                <tr>
-                    <td>590,001 至 1,330,000</td>
-                    <td>12</td>
-                    <td>41,300</td>
-                </tr>
-                <tr>
-                    <td>1,330,001 至 2,660,000</td>
-                    <td>20</td>
-                    <td>147,700</td>
-                </tr>
-                <tr>
-                    <td>2,660,001 至 4,980,000</td>
-                    <td>30</td>
-                    <td>413,700</td>
-                </tr>
-                <tr>
-                    <td>超過 4,980,000</td>
-                    <td>40</td>
-                    <td>911,700</td>
-                </tr>
-            </tbody>
-        </table>
-         <div class="table-note">
-             * 上述級距、稅率及累進差額係參考 2024 年度公告數字，2025 年度實際數字可能調整，請以財政部公告為準。<br>
-             * 所得淨額 = 綜合所得總額 - 免稅額 - 標準扣除額/列舉扣除額 - 特別扣除額。此試算僅含免稅額與標準扣除額。
+          <!-- 重置按鈕 -->
+          <div class="flex justify-center mt-10 md:mt-14">
+            <button onclick="resetSelections()" class="text-xl bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all">
+              🔄 重置選項
+            </button>
+          </div>
         </div>
-    </div>
-    <!-- 表格結束 -->
-
-    <div class="result" id="taxResult">
-      <!-- 結果會顯示在這裡 -->
+      </div>
     </div>
   </div>
 
   <script>
-    // **重要提示**：以下稅率、免稅額、標準扣除額、級距等數據僅供參考，
-    //             實際 2025 年數字需以財政部公告為準。
-    //             此試算亦不包含所有可能的扣除額及稅法細節。
-    const exemption = 97000; // 假設一般免稅額 9.7 萬
-    const taxBrackets = [
-      // 假設 2025 年稅率級距與 2024 年相同
-      { max: 590000, rate: 0.05, diff: 0 },
-      { max: 1330000, rate: 0.12, diff: 41300 },
-      { max: 2660000, rate: 0.20, diff: 147700 },
-      { max: 4980000, rate: 0.30, diff: 413700 },
-      { max: Infinity, rate: 0.40, diff: 911700 }
+    const groupDefs = [
+      { id: "empty", label: "全空" },
+      { id: "left", label: "隊長站左" },
+      { id: "center", label: "隊長站中" },
+      { id: "right", label: "隊長站右" }
     ];
 
-    function calculateTax() {
-      const income = parseInt(document.getElementById('income').value) || 0;
-      const standardDeduction = parseInt(document.getElementById('status').value); // 標準扣除額由身份決定
-      const dependents = parseInt(document.getElementById('dependents').value) || 0;
+    const groupsContainer = document.getElementById("groups");
 
-      // 計算總免稅額：本人 + (配偶如果已婚) + 扶養親屬
-      // 這裡的簡易模型是 (本人 + 扶養親屬) * 免稅額
-      // 更精確應根據申報身份判斷是否加計配偶免稅額，這裡配合標準扣除額的簡化，繼續使用 (1 + dependents) 模型
-      // 如果選擇已婚，總免稅額計算應為 (本人 + 配偶 + 扶養親屬) * 免稅額 = (2 + dependents) * exemption
-      // 為了符合一般理解的計算，修正總免稅額計算方式
-      let totalExemption;
-      const status = document.getElementById('status').value;
-      if (status === '131000') { // 單身
-          totalExemption = exemption * (1 + dependents);
-      } else { // 已婚
-          totalExemption = exemption * (2 + dependents);
-      }
+    // Define base and selected button classes
+    const defaultClasses = "md:text-4xl text-xl bg-transparent hover:bg-blue-600 text-blue-600 font-bold hover:text-white py-3 px-6 border-2 border-blue-600 rounded-xl transition-all duration-200 ease-in-out cursor-pointer";
+    const selectedClasses = "md:text-4xl text-xl bg-blue-600 font-bold text-white py-3 px-6 border-2 border-blue-600 rounded-xl shadow-md transition-all duration-200 ease-in-out cursor-pointer";
 
-
-      // 計算所得淨額 (所得總額 - 標準扣除額 - 總免稅額)
-      // 此處未考慮特別扣除額 (薪資、儲蓄、教育、幼兒、長照、身心障礙等)
-      const netIncome = income - standardDeduction - totalExemption;
-
-      // 計算應稅所得額 (所得淨額，但不為負數)
-      // 應稅所得額 = 所得淨額 - 特別扣除額 (此處未計算特別扣除額，所以應稅所得額 = 所得淨額，最低為0)
-      const taxable = Math.max(netIncome, 0); // 在此簡易試算中，應稅所得額等於所得淨額(不為負)
-
-      let rate = 0, diff = 0;
-      for (const bracket of taxBrackets) {
-        if (taxable <= bracket.max) {
-          rate = bracket.rate;
-          diff = bracket.diff;
-          break;
-        }
-      }
-
-      // 計算綜合所得稅額 = 應稅所得額 * 稅率 - 累進差額
-      const tax = taxable * rate - diff;
-
-      // 最終應納稅額，取計算結果與 0 的最大值，並四捨五入。
-      // 實際稅法還有基本生活費差額、基本稅額、海外所得、投資抵減等複雜計算。
-      const payableTax = Math.max(Math.round(tax), 0);
-
-       // 格式化數字，每三位加逗號
-      function formatNumber(num) {
-          return num.toLocaleString();
-      }
-
-
-      const resultText = `
-        所得總額：<span style="color:#007bff;">${formatNumber(income)}</span> 元<br>
-        總免稅額：<span style="color:#007bff;">${formatNumber(totalExemption)}</span> 元<br>
-        標準扣除額：<span style="color:#007bff;">${formatNumber(standardDeduction)}</span> 元<br>
-        所得淨額約：<span style="color:#007bff;">${formatNumber(Math.max(Math.round(netIncome), 0))}</span> 元<br>
-        <!-- 在此簡易試算中，應稅所得額等於所得淨額 -->
-        應稅所得約：<span style="color:#007bff;">${formatNumber(Math.round(taxable))}</span> 元<br>
-        適用稅率：<span style="color:#007bff;">${(rate * 100).toFixed(0)}</span> %<br>
-        累進差額：<span style="color:#007bff;">${formatNumber(diff)}</span> 元<br>
-        <hr style="margin: 15px 0; border-color: #e9ecef;">
-        <strong>預估應納稅額：<span style="color:#dc3545;">${formatNumber(payableTax)}</span> 元</strong>
+    groupDefs.forEach(({ id, label }) => {
+      const html = `
+        <fieldset class="flex flex-col md:flex-row items-center justify-start mb-8">
+          <p class="md:text-3xl text-lg text-center md:text-left mr-0 md:mr-6 md:w-1/3 w-full font-bold text-blue-700 mb-4 md:mb-0">${label}</p>
+          <div class="flex flex-1 justify-center md:justify-start space-x-4 md:space-x-8">
+            ${[0, 1, 2].map(i => `
+              <div>
+                <input hidden type="radio" id="${id + i}" name="${id}" value="${i}" />
+                <label name="${id}label" for="${id + i}" onclick="handleLabelClick(this)"
+                  class="${defaultClasses}">
+                  ${i}
+                </label>
+              </div>
+            `).join('')}
+          </div>
+        </fieldset>
       `;
+      groupsContainer.insertAdjacentHTML("beforeend", html);
+    });
 
-      document.getElementById('taxResult').innerHTML = resultText;
+    function handleLabelClick(el) {
+      if (window.calculateTimeout) clearTimeout(window.calculateTimeout);
+
+      const groupName = el.getAttribute('name'); // e.g., "emptyLabel"
+      const inputId = el.htmlFor; // e.g., "empty0"
+      const radioInput = document.getElementById(inputId); // the actual radio input
+
+      // Get all labels AND their corresponding radio inputs for this group
+      const allGroupLabels = document.querySelectorAll(`label[name="${groupName}"]`);
+
+      allGroupLabels.forEach(label => {
+        label.className = defaultClasses; // Reset visual state
+        document.getElementById(label.htmlFor).checked = false; // Uncheck corresponding input
+      });
+
+      // Set the clicked label's visual state and check its corresponding input
+      el.className = selectedClasses;
+      radioInput.checked = true;
+
+      window.calculateTimeout = setTimeout(() => calculate(), 300); // Debounce calculation
     }
+
+    function calculate() {
+      const MAPPING = {
+        "0011": "211", "0101": "121", "0110": "112",
+        "1011": "022", "1012": "031", "1021": "013",
+        "1101": "202", "1102": "301", "1110": "220",
+        "1120": "310", "1201": "103", "1210": "130",
+        "2112": "004", "2121": "040", "2211": "400",
+      };
+
+      const values = ["empty", "left", "center", "right"].map(name => {
+        return document.querySelector(`input[name="${name}"]:checked`)?.value;
+      });
+
+      const outputElement = document.getElementById("output");
+
+      if (values.includes(undefined)) {
+        outputElement.innerText = "請完成所有選擇"; // Clear if not all selected, or hint
+        outputElement.classList.remove("text-red-500");
+        outputElement.classList.add("text-blue-800"); // Ensure default color
+        return;
+      }
+
+      const result = MAPPING[values.join("")];
+      
+      if (result) {
+        outputElement.innerText = result;
+        outputElement.classList.remove("text-red-500");
+        outputElement.classList.add("text-blue-800"); // Default success color
+      } else {
+        outputElement.innerText = "此組合不存在，請重新確認。";
+        outputElement.classList.remove("text-blue-800");
+        outputElement.classList.add("text-red-500"); // Error color
+      }
+    }
+
+    function resetSelections() {
+      ["empty", "left", "center", "right"].forEach(name => {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(input => input.checked = false);
+        document.querySelectorAll(`label[name="${name}label"]`).forEach(label => {
+          label.className = defaultClasses;
+        });
+      });
+      document.getElementById("output").innerText = ""; // Clear output
+      document.getElementById("output").classList.remove("text-red-500"); // Remove error color if present
+      document.getElementById("output").classList.add("text-blue-800"); // Re-add default successful output color
+    }
+
+    // Initialize button styles and output text on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('label[name$="label"]').forEach(label => {
+        label.className = defaultClasses;
+      });
+      document.getElementById("output").innerText = "請選擇平台狀態"; // Initial prompt
+    });
   </script>
 </body>
 </html>
